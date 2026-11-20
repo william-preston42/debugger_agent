@@ -24,7 +24,7 @@ def main():
     messages = [
         {"role": "user", "content": args.user_prompt},
     ]
-    generate_content(client, messages,args.verbose)
+    generate_content(client, messages, args.verbose)
 
 def generate_content(client, messages, verbose):
     response = client.chat.completions.create(
