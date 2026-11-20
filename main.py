@@ -4,6 +4,7 @@ import argparse
 from dotenv import load_dotenv
 from openai import OpenAI
 
+
 def main():
     parser = argparse.ArgumentParser(description="Chatbot")
     parser.add_argument("user_prompt", type=str, help="User prompt")
@@ -19,22 +20,21 @@ def main():
         api_key=api_key,
     )
 
+    messages = [
+        {"role": "user", "content": args.user_prompt},
+    ]
+    generate_content(client, messages)
+
+def generate_content(client, messages):
     response = client.chat.completions.create(
         model="openrouter/free",
-        messages=[
-            {
-                "role": "user",
-                "content": args.user_prompt,
-            }
-        ],
+        messages=messages, # type: ignore
     )
-
     if response.usage is None:
         raise RuntimeError("Failed API request.")
-    
+
     print(f"Prompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}")
     print(f"Response:\n{response.choices[0].message.content}")
-
 
 if __name__ == "__main__":
     main()
