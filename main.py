@@ -22,8 +22,17 @@ response = client.chat.completions.create(
     ],
 )
 
+def token_usage() -> str | None:
+    if response.usage is None:
+        raise RuntimeError("Failed API request.")
+    return f"Prompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}"
+
+def agent_message():
+    return f"Response:\n{response.choices[0].message.content}"
+
 def main():
-    print(response.choices[0].message.content)
+    print(token_usage())
+    print(agent_message())
 
 if __name__ == "__main__":
     main()
