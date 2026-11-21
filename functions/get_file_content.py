@@ -10,7 +10,7 @@ schema_get_file_content = {
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "Directory path to file to read from, relative to the working directory",
+                    "description": "Directory path to list files from, relative to the working directory",
                 },
             },
         },
