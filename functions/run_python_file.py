@@ -2,6 +2,26 @@ import os
 from os.path import join
 import subprocess
 
+schema_run_python_file = {
+    "type": "function",
+    "function": {
+        "name": "run_python_file",
+        "description": "Runs a specified python file (and only python files) relative to the working directory, returns the return code and the STDOUT and STDERR output (if there is any)",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Directory path to python file to run, relative to the working directory",
+                },
+                "args": {
+                "type": "array[str]",
+                "description": "Extra arguments which can be passed to the file to run, default is None",
+                },
+            },
+        },
+    },
+}
 def run_python_file(working_directory: str, file_path: str, args: list[str] | None = None) -> str:
     try:
         absolute_working_directory = os.path.abspath(working_directory)

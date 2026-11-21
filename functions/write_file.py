@@ -1,5 +1,26 @@
 import os
+import re
 
+schema_write_file = {
+    "type": "function",
+    "function": {
+        "name": "write_file",
+        "description": "Writes to a specified file relative to the working directory, overwrites the original file",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Directory path to file to write to, relative to the working directory",
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The text which overwrites the original file",
+                },
+            },
+        },
+    },
+}
 def write_file(working_directory: str, file_path: str, content: str) -> str:
     try: 
         absolute_working_directory = os.path.abspath(working_directory)
@@ -17,4 +38,4 @@ def write_file(working_directory: str, file_path: str, content: str) -> str:
         return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
 
     except Exception as e:
-        print(f"Error: {e}")
+        return f"Error: {e}"
