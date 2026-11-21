@@ -1,6 +1,8 @@
 import os
 import argparse
 import json
+import re
+import sys
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -27,11 +29,17 @@ def main():
         {"role": "system", "content": system_prompt },
         {"role": "user", "content": args.user_prompt},
     ]
-    generate_content(client, messages, args.verbose)
-
+    for _ in range(20):
+        content = generate_content(client, messages, args.verbose)
+        if content is not None:
+            print(content)
+            return
+    print("Agent took too long")
+    sys.exit(1)
+        
 def generate_content(client, messages, verbose):
     response = client.chat.completions.create(
-        model="openrouter/free",
+        model="google/gemini-2.5-flash",
         messages=messages, # type: ignore
         tools=available_functions,
     )
@@ -43,11 +51,15 @@ def generate_content(client, messages, verbose):
         print(f"Prompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}")
 
     message = response.choices[0].message
+    messages.append(message)
+    if not message.tool_calls:
+        return message.content
     for tool_call in message.tool_calls:
-        function_args = json.loads(tool_call.function.arguments or "{}")
         message_result = call_function(tool_call, verbose)
         if verbose:
             print(f"-> {message_result['content']}")
+        messages.append(message_result)
+    return None
 
 if __name__ == "__main__":
     main()
