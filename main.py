@@ -1,9 +1,11 @@
 import os
 import argparse
+import json
 
 from dotenv import load_dotenv
 from openai import OpenAI
 from prompts import system_prompt
+from call_functions import available_functions
 
 def main():
     parser = argparse.ArgumentParser(description="Chatbot")
@@ -31,6 +33,7 @@ def generate_content(client, messages, verbose):
     response = client.chat.completions.create(
         model="openrouter/free",
         messages=messages, # type: ignore
+        tools=available_functions,
     )
     if response.usage is None:
         raise RuntimeError("Failed API request.")
@@ -38,6 +41,11 @@ def generate_content(client, messages, verbose):
     if verbose is True:
         print(f"User prompt: {messages[-1]["content"]}")
         print(f"Prompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}")
+
+    message = response.choices[0].message
+    for tool_call in message.tool_calls:
+        function_args = json.loads(tool_call.function.arguments or "{}")
+        print(f"Calling function: {tool_call.function.name}({function_args})")
     print(f"Response:\n{response.choices[0].message.content}")
 
 if __name__ == "__main__":
